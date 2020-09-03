@@ -36,13 +36,13 @@ class ProcessMDFileDriver(object):
         ipynb_file = base_name + ".ipynb"
         log_file = base_name + ".stdout.log"
         batch_exit_code = os.system("python3 %s/tools/batch/submit-job.py --region us-east-1 --wait \
-                  --timeout 3600 --saved-output %s/docs/examples \
+                  --timeout 3600 --saved-output /gluon-nlp/docs/examples \
                   --name GluonNLP-%s-%s \
                   --save-path batch/%s/%s/gluon-nlp/docs/examples \
                   --work-dir . --source-ref %s \
                   --remote https://github.com/%s \
                   --command 'python3 -m pip install --quiet nbformat notedown jupyter_client ipykernel && python3 /gluon-nlp/docs/md2ipynb.py %s | tee > %s'" % \
-                  (dir_name, dir_name, self.branch_name, self.run_number, self.branch_name, \
+                  (dir_name, self.branch_name, self.run_number, self.branch_name, \
                     self.run_number, self.refs, self.remote, md_file, log_file))
 
         os.system("aws s3api wait object-exists --bucket gluon-nlp-dev \
