@@ -5,6 +5,7 @@ import re
 import multiprocessing as mp
 
 HOME_PATH = os.path.expandvars('$HOME') + "/work/gluon-nlp"
+# HOME_PATH = os.path.expandvars('$HOME')
 
 class ProcessMDFileDriver(object):
     def __init__(self, args):
@@ -30,37 +31,55 @@ class ProcessMDFileDriver(object):
         return self.md_file_list
 
     def process_md_file(self, md_file):
-        md_file = "/gluon-nlp/" + re.search(r"[d][o][c][s][/][e][x][a][m][p][l][e](.*)", md_file).group(0)
+        md_file = "/gluon-nlp/" + re.search(r"docs/examples(.*)", md_file).group(0)
         dir_name = HOME_PATH + "/gluon-nlp"
         base_name = md_file[0:-3]
         ipynb_file = base_name + ".ipynb"
         log_file = base_name + ".stdout.log"
+        print("Submit jobs to AWS Batch")
         batch_exit_code = os.system("python3 %s/tools/batch/submit-job.py --region us-east-1 --wait \
                   --timeout 3600 --saved-output /gluon-nlp/docs/examples \
                   --name GluonNLP-%s-%s \
-                  --save-path batch/%s/%s/gluon-nlp/docs/examples \
+                  --save-path gluon-nlp/docs/examples \
                   --work-dir . --source-ref %s \
                   --remote https://github.com/%s \
-                  --command 'python3 -m pip install --quiet nbformat notedown jupyter_client ipykernel && python3 /gluon-nlp/docs/md2ipynb.py %s | tee > %s'" % \
-                  (dir_name, self.branch_name, self.run_number, self.branch_name, \
-                    self.run_number, self.refs, self.remote, md_file, log_file))
+                  --command 'python3 -m pip install --quiet nbformat notedown jupyter_client ipykernel && python3 /gluon-nlp/docs/md2ipynb.py %s | tee > %s' \
+                  | grep 'jobId: ' > %s/gluon-nlp/jobid.log" % \
+                  (dir_name, self.branch_name, self.run_number, \
+                    self.refs, self.remote, md_file, log_file, HOME_PATH))
 
+        job_id = self._find_job_id()
+        print("Job ID is %s" % job_id)
+        os.system("rm %s/gluon-nlp/jobid.log" % HOME_PATH)
+
+        print("Copy log file")
         os.system("aws s3api wait object-exists --bucket gluon-nlp-dev \
-                  --key batch/%s/%s%s" % \
-                  (self.branch_name, self.run_number, log_file))
-        os.system("aws s3 cp s3://gluon-nlp-dev/batch/%s/%s%s %s" % \
-                  (self.branch_name, self.run_number, log_file, HOME_PATH + log_file))
+                  --key batch/%s%s" % \
+                  (job_id, log_file))
+        os.system("aws s3 cp s3://gluon-nlp-dev/batch/%s%s %s" % \
+                  (job_id, log_file, HOME_PATH + log_file))
         os.system("cat %s" % log_file)
 
+        print("Copy notebooks")
         if batch_exit_code != 0:
             print("AWS Batch Task Failed")
         else:
             os.system("aws s3api wait object-exists --bucket gluon-nlp-dev \
-                  --key batch/%s/%s%s" % \
-                  (self.branch_name, self.run_number, ipynb_file))
-            os.system("aws s3 cp s3://gluon-nlp-dev/batch/%s/%s%s %s" % \
-                  (self.branch_name, self.run_number, ipynb_file, HOME_PATH + ipynb_file))
+                  --key batch/%s%s" % \
+                  (job_id, ipynb_file))
+            os.system("aws s3 cp s3://gluon-nlp-dev/batch/%s%s %s" % \
+                  (job_id, ipynb_file, HOME_PATH + ipynb_file))
         sys.exit(batch_exit_code)
+
+    def _find_job_id(self):
+        try:
+            with open(HOME_PATH + '/gluon-nlp/jobid.log') as f:
+                for line in f:
+                    if "jobId" in line:
+                        return re.search(r'jobId:\s*([^\n]+)', job_id).group(1)
+        except Exception as e:
+            print(e)
+            pass
 
     def upload_website(self):
         os.chdir(HOME_PATH + "/gluon-nlp")
