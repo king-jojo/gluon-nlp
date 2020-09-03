@@ -1,6 +1,6 @@
 name: continuous build - docs
 
-on: [push, pull_request]
+on: [push, pull_request_target]
 
 defaults:
   run:
@@ -33,6 +33,17 @@ jobs:
           python -m pip install --quiet -e .[extras]
           python -m pip install setuptools ipython sphinx>=1.5.5 sphinx-gallery nbsphinx notedown sphinx_rtd_theme mxtheme sphinx-autodoc-typehints matplotlib Image recommonmark jupyter_client ipykernel
           python -m nltk.downloader perluniprops nonbreaking_prefixes punkt
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Compile Notebooks
+        run: |
+          python ./tools/batch/batch_states/compile_notebook.py --branch-name ${{ github.ref }} --run-number ${{ github.run_id }} --remote ${{ github.repository }} --refs ${{ github.ref }}
 
       - name: Build Website local
         run: |
