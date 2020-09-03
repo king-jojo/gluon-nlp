@@ -4,7 +4,7 @@ import sys
 import re
 import multiprocessing as mp
 
-HOME_PATH = os.path.expandvars('$HOME') + "/work"
+HOME_PATH = os.path.expandvars('$HOME') + "/work/gluon-nlp"
 
 class ProcessMDFileDriver(object):
     def __init__(self, args):
