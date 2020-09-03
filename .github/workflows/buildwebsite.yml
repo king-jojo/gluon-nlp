@@ -43,7 +43,7 @@ jobs:
 
       - name: Compile Notebooks
         run: |
-          python ./tools/batch/batch_states/compile_notebook.py --branch-name ${{ github.ref }} --run-number ${{ github.run_id }} --remote ${{ github.repository }} --refs ${{ github.ref }}
+          python ./tools/batch/batch_states/compile_notebook.py --branch-name ${{ github.ref }} --run-number ${{ github.run_id }} --remote ${{ github.repository }} --refs refs/heads/new-documentation-website
 
       - name: Build Website local
         run: |
