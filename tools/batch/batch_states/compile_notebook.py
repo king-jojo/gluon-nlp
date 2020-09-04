@@ -5,13 +5,11 @@ import re
 import multiprocessing as mp
 
 HOME_PATH = os.path.expandvars('$HOME') + "/work/gluon-nlp"
-# HOME_PATH = os.path.expandvars('$HOME')
 
-class ProcessMDFileDriver(object):
+class DeployWebsiteDriver(object):
     def __init__(self, args):
         self.md_file_list = []
-        self.branch_name = args.branch_name
-        self.run_number = args.run_number
+        self.pr_number = args.pr_number
         self.remote = args.remote
         self.refs = args.refs
 
@@ -30,25 +28,38 @@ class ProcessMDFileDriver(object):
     def get_md_list(self):
         return self.md_file_list
 
-    def process_md_file(self, md_file):
+    def compile_notebooks(self, md_file):
         md_file = "/gluon-nlp/" + re.search(r"docs/examples(.*)", md_file).group(0)
         dir_name = HOME_PATH + "/gluon-nlp"
         base_name = md_file[0:-3]
         ipynb_file = base_name + ".ipynb"
         log_file = base_name + ".stdout.log"
         print("Submit jobs to AWS Batch")
-        batch_exit_code = os.system("python3 %s/tools/batch/submit-job.py --region us-east-1 --wait \
-                  --timeout 3600 --saved-output /gluon-nlp/docs/examples \
-                  --name GluonNLP-%s-%s \
+        batch_exit_code = os.system("python3 %s/tools/batch/submit-job.py --region us-east-1 \
+                  --wait \
+                  --timeout 3600 \
+                  --saved-output /gluon-nlp/docs/examples \
+                  --name GluonNLP-Docs-%s-%s \
                   --save-path gluon-nlp/docs/examples \
-                  --work-dir . --source-ref %s \
+                  --work-dir . \
+                  --source-ref %s \
                   --remote https://github.com/%s \
                   --command 'python3 -m pip install --quiet nbformat notedown jupyter_client ipykernel && python3 /gluon-nlp/docs/md2ipynb.py %s | tee > %s' \
-                  | grep 'jobId: ' > %s/gluon-nlp/jobid.log" % \
-                  (dir_name, self.branch_name, self.run_number, \
-                    self.refs, self.remote, md_file, log_file, HOME_PATH))
+                  > temp.log" % \
+                  (dir_name, self.refs, self.pr_number, \
+                    self.refs, self.remote, md_file, log_file))
 
-        job_id = self._find_job_id()
+
+        os.system("head -100 temp.log | grep -oP -m 1 'jobId: \\K(.*)' > %s/gluon-nlp/jobid.log" % HOME_PATH)
+        os.system("rm temp.log")
+
+        try:
+            with open(HOME_PATH + "/gluon-nlp/jobid.log", 'r') as f:
+                job_id = f.readline().rstrip("\n")
+        except Exception as e:
+            print(e)
+            pass
+
         print("Job ID is %s" % job_id)
         os.system("rm %s/gluon-nlp/jobid.log" % HOME_PATH)
 
@@ -58,7 +69,6 @@ class ProcessMDFileDriver(object):
                   (job_id, log_file))
         os.system("aws s3 cp s3://gluon-nlp-dev/batch/%s%s %s" % \
                   (job_id, log_file, HOME_PATH + log_file))
-        os.system("cat %s" % log_file)
 
         print("Copy notebooks")
         if batch_exit_code != 0:
@@ -69,37 +79,26 @@ class ProcessMDFileDriver(object):
                   (job_id, ipynb_file))
             os.system("aws s3 cp s3://gluon-nlp-dev/batch/%s%s %s" % \
                   (job_id, ipynb_file, HOME_PATH + ipynb_file))
+
+        # os.chdir(HOME_PATH + "/gluon-nlp")
+        # os.system("make docs_local")
+        # os.system("aws s3 sync --delete %s/docs/_build/html/ s3://gluon-nlp-dev/%s/ --acl public-read" % \
+        #           (dir_name, self.refs))
+        # print("Uploaded doc to http://gluon-nlp-dev.s3-accelerate.dualstack.amazonaws.com/%s/index.html" % self.refs)
         sys.exit(batch_exit_code)
-
-    def _find_job_id(self):
-        try:
-            with open(HOME_PATH + '/gluon-nlp/jobid.log') as f:
-                for line in f:
-                    if "jobId" in line:
-                        return re.search(r'jobId:\s*([^\n]+)', job_id).group(1)
-        except Exception as e:
-            print(e)
-            pass
-
-    def upload_website(self):
-        os.chdir(HOME_PATH + "/gluon-nlp")
-        os.system("make docs_local")
-        os.system("aws s3 sync --delete docs/_build/html/ s3://gluon-nlp-dev/%s/ --acl public-read" % \
-                  self.branch_name)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser.add_argument('--branch-name', help='branch name of the repo.', type=str, default='master')
-    parser.add_argument('--run-number', help='number of worflow run', type=str, default=None)
+    parser.add_argument('--pr-number', help='number of pull request', type=str, default='0')
     parser.add_argument('--remote', help='git repo address.', type=str, default='https://github.com/dmlc/gluon-nlp')
     parser.add_argument('--refs', help='ref in the repo.', type=str, default='master')
     args = parser.parse_args()
 
-    driver = ProcessMDFileDriver(args)
+    driver = DeployWebsiteDriver(args)
     driver.find_md_file(HOME_PATH + '/gluon-nlp/docs/examples')
 
     # pool = mp.Pool(processes=4)
     # pool.map(driver.process_md_file, driver.get_md_list())
 
     for f in driver.get_md_list():
-        driver.process_md_file(f)
+        driver.compile_notebooks(f)

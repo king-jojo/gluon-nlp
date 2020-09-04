@@ -41,9 +41,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: Compile Notebooks
+      - name: Compile Notebooks(For push)
+        if: ${{ github.event_name == 'push' }}
         run: |
-          python ./tools/batch/batch_states/compile_notebook.py --branch-name ${{ github.ref }} --run-number ${{ github.run_id }} --remote ${{ github.repository }} --refs refs/heads/new-documentation-website
+          python ./tools/batch/batch_states/compile_notebook.py \
+                 --remote ${{ github.repository }} \
+                 --refs ${{ github.ref }}
+
+      - name: Compile Notebooks(For pull request)
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'pull_request_target' }}
+        run: |
+          python ./tools/batch/batch_states/compile_notebook.py \
+                 --pr-number ${{ github.event.number }} \
+                 --remote ${{ github.event.pull_request.head.repo.full_name }} \
+                 --refs ${{ github.ref }}
+
 
       - name: Build Website local
         run: |
