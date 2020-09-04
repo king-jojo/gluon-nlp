@@ -2,14 +2,16 @@ import os
 import argparse
 import sys
 import re
-import multiprocessing as mp
 
 HOME_PATH = os.path.expandvars('$HOME') + "/work/gluon-nlp"
 
 class DeployWebsiteDriver(object):
     def __init__(self, args):
         self.md_file_list = []
-        self.pr_number = args.pr_number
+        if args.pr_number != '0':
+            self.pr_number = 'PR#' + args.pr_number
+        else: 
+            self.pr_number = 'push'
         self.remote = args.remote
         self.refs = args.refs
 
@@ -63,6 +65,8 @@ class DeployWebsiteDriver(object):
         print("Job ID is %s" % job_id)
         os.system("rm %s/gluon-nlp/jobid.log" % HOME_PATH)
 
+        os.system("python3 %s/tools/batch/wait-job.py --job-id %s" % (dir_name, job_id))
+
         print("Copy log file")
         os.system("aws s3api wait object-exists --bucket gluon-nlp-dev \
                   --key batch/%s%s" % \
@@ -79,12 +83,7 @@ class DeployWebsiteDriver(object):
                   (job_id, ipynb_file))
             os.system("aws s3 cp s3://gluon-nlp-dev/batch/%s%s %s" % \
                   (job_id, ipynb_file, HOME_PATH + ipynb_file))
-
-        # os.chdir(HOME_PATH + "/gluon-nlp")
-        # os.system("make docs_local")
-        # os.system("aws s3 sync --delete %s/docs/_build/html/ s3://gluon-nlp-dev/%s/ --acl public-read" % \
-        #           (dir_name, self.refs))
-        # print("Uploaded doc to http://gluon-nlp-dev.s3-accelerate.dualstack.amazonaws.com/%s/index.html" % self.refs)
+        
         sys.exit(batch_exit_code)
 
 if __name__ == '__main__':
@@ -96,9 +95,6 @@ if __name__ == '__main__':
 
     driver = DeployWebsiteDriver(args)
     driver.find_md_file(HOME_PATH + '/gluon-nlp/docs/examples')
-
-    # pool = mp.Pool(processes=4)
-    # pool.map(driver.process_md_file, driver.get_md_list())
 
     for f in driver.get_md_list():
         driver.compile_notebooks(f)
