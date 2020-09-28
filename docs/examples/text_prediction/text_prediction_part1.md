@@ -26,7 +26,6 @@ In GluonNLP, we can use `nlp_data` to download the dataset. The downloaded datas
 
 ```shell
 !nlp_data prepare_glue --benchmark glue -t sst
-!nlp_data prepare_glue --benchmark glue -t sts
 ```
 
 
@@ -34,6 +33,11 @@ In GluonNLP, we can use `nlp_data` to download the dataset. The downloaded datas
 sst_train_df = pd.read_parquet('./glue/sst/train.parquet')
 sst_valid_df = pd.read_parquet('./glue/sst/dev.parquet')
 sst_train_df.head(10)
+```
+
+
+```shell
+!nlp_data prepare_glue --benchmark glue -t sts
 ```
 
 

@@ -31,6 +31,9 @@ As mentioned in the [previous section](./text_prediction_part1.html), we can loa
 
 ```shell
 !nlp_data prepare_glue --benchmark glue -t sst
+```
+
+```shell
 !nlp_data prepare_glue --benchmark glue -t sts
 ```
 
