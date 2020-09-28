@@ -24,7 +24,7 @@ Let's download two datasets from the [GLUE benchmark](https://gluebenchmark.com/
 In GluonNLP, we can use `nlp_data` to download the dataset. The downloaded dataset has been preprocessed to the [parquet](https://parquet.apache.org/) format that can be loaded by [pandas](https://pandas.pydata.org/).
 
 
-```shellscript
+```shell
 !nlp_data prepare_glue --benchmark glue -t sst
 !nlp_data prepare_glue --benchmark glue -t sts
 ```
