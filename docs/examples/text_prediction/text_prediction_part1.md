@@ -31,8 +31,8 @@ In GluonNLP, we can use `nlp_data` to download the dataset. The downloaded datas
 
 
 ```{.python .input}
-sst_train_df = pd.read_parquet('glue/sst/train.parquet')
-sst_valid_df = pd.read_parquet('glue/sst/dev.parquet')
+sst_train_df = pd.read_parquet('./glue/sst/train.parquet')
+sst_valid_df = pd.read_parquet('./glue/sst/dev.parquet')
 sst_train_df.head(10)
 ```
 
