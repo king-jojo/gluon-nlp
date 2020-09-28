@@ -38,8 +38,8 @@ sst_train_df.head(10)
 
 
 ```{.python .input}
-sts_train_df = pd.read_parquet('glue/sts/train.parquet')
-sts_valid_df = pd.read_parquet('glue/sts/dev.parquet')
+sts_train_df = pd.read_parquet('./glue/sts/train.parquet')
+sts_valid_df = pd.read_parquet('./glue/sts/dev.parquet')
 sts_train_df.head(10)
 ```
 
