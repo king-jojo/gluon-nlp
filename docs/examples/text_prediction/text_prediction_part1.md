@@ -26,6 +26,8 @@ In GluonNLP, we can use `nlp_data` to download the dataset. The downloaded datas
 
 ```shell
 !nlp_data prepare_glue --benchmark glue -t sst
+!ls
+!ls glue
 ```
 
 
@@ -38,6 +40,8 @@ sst_train_df.head(10)
 
 ```shell
 !nlp_data prepare_glue --benchmark glue -t sts
+!ls
+!ls glue
 ```
 
 
