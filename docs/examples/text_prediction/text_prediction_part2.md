@@ -29,7 +29,7 @@ set_seed(123)
 As mentioned in the previous section, we can load the dataset via nlp_data. We load the Stanford Sentiment Treebank (SST) dataset and the Semantic Textual Similarity (STS) dataset.
 
 
-```
+```{.shell .input}
 !nlp_data prepare_glue --benchmark glue -t sst
 !nlp_data prepare_glue --benchmark glue -t sts
 ```
