@@ -25,21 +25,21 @@ In GluonNLP, we can use `nlp_data` to download the dataset. The downloaded datas
 
 
 ```sh
-!nlp_data prepare_glue --benchmark glue -t sst
-!nlp_data prepare_glue --benchmark glue -t sts
+!nlp_data prepare_glue --benchmark glue -t sst /tmp1
+!nlp_data prepare_glue --benchmark glue -t sts /tmp2
 ```
 
 
 ```{.python .input}
-sst_train_df = pd.read_parquet('./glue/sst/train.parquet')
-sst_valid_df = pd.read_parquet('./glue/sst/dev.parquet')
+sst_train_df = pd.read_parquet('/tmp1/glue/sst/train.parquet')
+sst_valid_df = pd.read_parquet('/tmp1/glue/sst/dev.parquet')
 sst_train_df.head(10)
 ```
 
 
 ```{.python .input}
-sts_train_df = pd.read_parquet('./glue/sts/train.parquet')
-sts_valid_df = pd.read_parquet('./glue/sts/dev.parquet')
+sts_train_df = pd.read_parquet('/tmp2/glue/sts/train.parquet')
+sts_valid_df = pd.read_parquet('/tmp2/glue/sts/dev.parquet')
 sts_train_df.head(10)
 ```
 
