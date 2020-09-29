@@ -26,13 +26,11 @@ set_seed(123)
 
 ### Load Dataset
 
-As mentioned in the previous section, we can load the dataset via nlp_data. We load the Stanford Sentiment Treebank (SST) dataset and the Semantic Textual Similarity (STS) dataset.
+As mentioned in the [previous section](./text_prediction_part1.html), we can load the dataset via `nlp_data`. We load the Stanford Sentiment Treebank (SST) dataset and the Semantic Textual Similarity (STS) dataset.
 
+$ nlp_data prepare_glue --benchmark glue -t sst
+$ nlp_data prepare_glue --benchmark glue -t sts
 
-```{.shell .input}
-!nlp_data prepare_glue --benchmark glue -t sst
-!nlp_data prepare_glue --benchmark glue -t sts
-```
 
 For simplicity, we randomly choose 2000 samples from SST as our training data.
 
@@ -66,7 +64,7 @@ sts_train_df.head(5)
 
 ### Load MobileBERT
 
-We load the MobileBERT via get_backbone.
+We load the MobileBERT via `get_backbone`.
 
 
 ```{.python .input}
@@ -77,6 +75,13 @@ backbone = model_cls.from_cfg(cfg)
 ### Preprocess the Data
 
 There are two scenarios, a single sentence and multiple sentences.
+
+
+- <font color='red'>[CLS]</font> TOKENS <font color='red'>[SEP]</font>
+- <font color='red'>[CLS]</font> TOKENS1 <font color='red'>[SEP]</font> TOKENS2 <font color='red'>[SEP]</font>
+
+<center><img src="merge_input.png" alt="merge_input" style="width: 1000px;"/></center>
+
 
 
 ```{.python .input}
@@ -131,12 +136,12 @@ print('After processing:', processed_sts_train[0])
 When sample minibatches for text classification/regression, each text **may not have the same length**. You can use the built-in batchify functions in Gluon to help convert the data into batches.
 
 Recall that we have,
-- Train Sample: ((token_ids, token_types, valid_length), label)
-- Valid Sample: (token_ids, token_types, valid_length)
+- Train Sample: `((token_ids, token_types, valid_length), label)`
+- Valid Sample: `(token_ids, token_types, valid_length)`
 
 The corresponding batchify can be constructed similar to the python typing notation
-- Train: Group[Group[Pad, Pad, Stack], Stack]
-- Valid: Group[Pad, Pad, Stack]
+- Train: `Group[Group[Pad, Pad, Stack], Stack]`
+- Valid: `Group[Pad, Pad, Stack]`
 
 Let's construct and test the batchify.
 

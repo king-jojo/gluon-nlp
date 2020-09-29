@@ -1,6 +1,6 @@
 # Part 1: Quickstart of Pretrained Backbones
 
-In this section, we will load two datasets using the nlp_data command and then try out different backbone models.
+In this section, we will load two datasets using the `nlp_data` command and then try out different backbone models.
 
 
 ```{.python .input}
@@ -21,13 +21,11 @@ Let's download two datasets from the [GLUE benchmark](https://gluebenchmark.com/
 - The Standford Sentiment Treebank (SST-2)
 - Semantic Textual Similarity Benchmark (STS-B)
 
-In GluonNLP, we can use nlp_data to download the dataset. The downloaded dataset has been preprocessed to the [parquet](https://parquet.apache.org/) format that can be loaded by [pandas](https://pandas.pydata.org/).
+In GluonNLP, we can use `nlp_data` to download the dataset. The downloaded dataset has been preprocessed to the [parquet](https://parquet.apache.org/) format that can be loaded by [pandas](https://pandas.pydata.org/).
 
+$ nlp_data prepare_glue --benchmark glue -t sst
+$ nlp_data prepare_glue --benchmark glue -t sts
 
-```{.shell .input}
-!nlp_data prepare_glue --benchmark glue -t sst
-!nlp_data prepare_glue --benchmark glue -t sts
-```
 
 
 ```{.python .input}
@@ -84,7 +82,7 @@ print(local_params_path)
 
 ### Create the Backbone
 
-To create a new backbone model in Gluon, you can just use the following commands. Here, as shown in the first example, backbone.hybridize() allows computation to be done using the symbolic backend.
+To create a new backbone model in Gluon, you can just use the following commands. Here, as shown in the first example, `backbone.hybridize()` allows computation to be done using the symbolic backend.
 
 
 ```{.python .input}
@@ -93,9 +91,9 @@ backbone.hybridize()
 backbone.load_parameters(local_params_path)
 ```
 
-You can directly use the backbone to extract the contextual embeddings.
+You can directly use the `backbone` to extract the contextual embeddings.
 
-For BERT, it will output one embedding vector for the whole sentence --- cls_embedding and a bounch of contextual embedding vectors for each token --- token_embeddings.
+For BERT, it will output one embedding vector for the whole sentence --- `cls_embedding` and a bounch of contextual embedding vectors for each token --- `token_embeddings`.
 
 
 ```{.python .input}
@@ -106,6 +104,8 @@ token_types = mx.np.array([0] * len(token_ids[0]))
 valid_length = mx.np.array([len(token_ids[0])])
 token_embeddings, cls_embedding = backbone(token_ids, token_types, valid_length)
 ```
+
+<center><img src="bert_illustration.png" alt="bert_illustration" style="width: 600px;"/></center>
 
 
 ```{.python .input}
@@ -123,7 +123,7 @@ print(token_embeddings)
 
 ### More Backbone Models in GluonNLP
 
-Apart from BERT, GluonNLP has provided other backbone models including the recent models like [XLM-R](https://arxiv.org/pdf/1911.02116.pdf), [ALBERT](https://arxiv.org/pdf/1909.11942.pdf), [ELECTRA](https://openreview.net/pdf?id=r1xMH1BtvB), and [MobileBERT](https://arxiv.org/pdf/2004.02984.pdf). We can use list_backbone_names to list all the backbones that are supported in GluonNLP.
+Apart from BERT, GluonNLP has provided other backbone models including the recent models like [XLM-R](https://arxiv.org/pdf/1911.02116.pdf), [ALBERT](https://arxiv.org/pdf/1909.11942.pdf), [ELECTRA](https://openreview.net/pdf?id=r1xMH1BtvB), and [MobileBERT](https://arxiv.org/pdf/2004.02984.pdf). We can use `list_backbone_names` to list all the backbones that are supported in GluonNLP.
 
 
 ```{.python .input}
@@ -131,7 +131,7 @@ from gluonnlp.models import list_backbone_names
 list_backbone_names()
 ```
 
-It is straightforward to load the other models by specifying the name of the model. Here, let's compare the number of parameters of BERT and MobileBERT based on get_backbone.
+It is straightforward to load the other models by specifying the name of the model. Here, let's compare the number of parameters of BERT and MobileBERT based on `get_backbone`.
 
 
 ```{.python .input}
