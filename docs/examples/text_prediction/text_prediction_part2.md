@@ -30,21 +30,21 @@ As mentioned in the [previous section](./text_prediction_part1.html), we can loa
 
 
 ```sh
-!nlp_data prepare_glue --benchmark glue -t sst -d /gluon-nlp/tmp1
-!nlp_data prepare_glue --benchmark glue -t sts -d /gluon-nlp/tmp2
+!nlp_data prepare_glue --benchmark glue -t sst
+!nlp_data prepare_glue --benchmark glue -t sts
 ```
 
 For simplicity, we randomly choose 2000 samples from SST as our training data.
 
 
 ```{.python .input}
-sst_train_df = pd.read_parquet('/gluo-nnlp/tmp1/glue/sst/train.parquet')
+sst_train_df = pd.read_parquet('glue/sst/train.parquet')
 # For simplicity, we just use 2000 samples for training for SST
 rng_state = np.random.RandomState(123)
 train_perm = rng_state.permutation(len(sst_train_df))
 # Just use 2000 samples for training
 sst_train_df = sst_train_df.iloc[train_perm[:2000]]
-sst_dev_df = pd.read_parquet('/gluon-nlp/tmp1/glue/sst/dev.parquet')
+sst_dev_df = pd.read_parquet('glue/sst/dev.parquet')
 ```
 
 
@@ -55,8 +55,8 @@ sst_train_df.head(5)
 
 ```{.python .input}
 # Load STS
-sts_train_df = pd.read_parquet('/gluon-nlp/tmp2/glue/sts/train.parquet')[['sentence1', 'sentence2', 'score']]
-sts_dev_df = pd.read_parquet('/gluon-nlp/tmp2/glue/sts/dev.parquet')[['sentence1', 'sentence2', 'score']]
+sts_train_df = pd.read_parquet('glue/sts/train.parquet')[['sentence1', 'sentence2', 'score']]
+sts_dev_df = pd.read_parquet('glue/sts/dev.parquet')[['sentence1', 'sentence2', 'score']]
 ```
 
 
