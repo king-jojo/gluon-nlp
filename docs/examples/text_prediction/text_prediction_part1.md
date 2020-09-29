@@ -107,8 +107,6 @@ valid_length = mx.np.array([len(token_ids[0])])
 token_embeddings, cls_embedding = backbone(token_ids, token_types, valid_length)
 ```
 
-<center><img src="../../_img/bert_illustration.png" alt="bert_illustration" style="width: 600px;"/></center>
-
 
 ```{.python .input}
 print(cls_embedding.shape)

@@ -79,13 +79,6 @@ backbone = model_cls.from_cfg(cfg)
 There are two scenarios, a single sentence and multiple sentences.
 
 
-- <font color='red'>[CLS]</font> TOKENS <font color='red'>[SEP]</font>
-- <font color='red'>[CLS]</font> TOKENS1 <font color='red'>[SEP]</font> TOKENS2 <font color='red'>[SEP]</font>
-
-<center><img src="../../_img/merge_input.png" alt="merge_input" style="width: 1000px;"/></center>
-
-
-
 ```{.python .input}
 def preprocess_data(df, feature_columns, label_column, tokenizer,
                     max_length=128, use_label=True, use_tqdm=True):
