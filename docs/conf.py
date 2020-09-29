@@ -171,10 +171,10 @@ html_theme_options = {
     'primary_color': 'blue',
     'accent_color': 'deep_orange',
     'header_links' : [
-        ('Install', 'install/install-more', False, ''),
-        ('API', 'api/index', False, ''),
-        ('Community', 'website/index', False, ''),
-        ('Contribute', 'website/contribute', False, ''),
+        ('Install', 'install/install-more', True, 'fas fa-download'),
+        ('API', 'api/index', True, 'fas fa-book'),
+        ('Community', 'website/index', True, 'fab fa-discourse'),
+        ('Contribute', 'website/contribute', True, 'fas fa-laptop-code'),
         ('GitHub', 'https://github.com/dmlc/gluon-nlp/', True, 'fab fa-github'),
     ],
 
