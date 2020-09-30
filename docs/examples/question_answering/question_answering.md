@@ -146,7 +146,7 @@ print('Reconstructed:', tokenizer.decode(tokens[token_start_pos:token_end_pos+1]
 print('Ground-Truth:', example.answer_text)
 ```
 
-In the following, we call the `convert_squad_example_to_feature` that is defined in [squad_utils.py](./squad_utils.py). This will convert character-level start and end to the token-level start and ends using the aforementioned algorithm.
+In the following, we call the `convert_squad_example_to_feature` that is defined in squad_utils.py. This will convert character-level start and end to the token-level start and ends using the aforementioned algorithm.
 
 
 ```{.python .input}
@@ -165,7 +165,7 @@ p(y_{\text{ans}}, y_{\text{start}}, y_{\text{end}} \mid X) = p(y_{\text{ans}} \m
 
 One advantage of this conditional architecture is that we can use [beam search](https://d2l.ai/chapter_recurrent-modern/beam-search.html) to first sample the promising starting positions, and then sample the end positions based on the starting positions.
 
-Here, we have implemented the conditional architecture in [squad_utils.py](squad_utils.py). We won't go into the details. By inserting the architecture on top of the backbone model, we are able to build a model for SQuAD.
+Here, we have implemented the conditional architecture in squad_utils.py. We won't go into the details. By inserting the architecture on top of the backbone model, we are able to build a model for SQuAD.
 
 
 ```{.python .input}

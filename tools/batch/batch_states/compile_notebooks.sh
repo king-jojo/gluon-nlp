@@ -26,8 +26,6 @@ compile_notebook () {
             --source-ref ${refs} \
             --remote https://github.com/${remote} \
             --command "python3 -m pip install --quiet nbformat notedown jupyter_client ipykernel matplotlib && \
-                       nlp_data prepare_glue --benchmark glue -t sst -d /gluon-nlp/docs/examples/text_prediction/glue && \
-                       nlp_data prepare_glue --benchmark glue -t sts -d /gluon-nlp/docs/examples/text_prediction/glue && \
                        python3 /gluon-nlp/docs/md2ipynb.py ${MDFILE}" 2>&1 | tee $LOGNAME >/dev/null
 
     BATCH_EXIT_CODE=$?
